@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "title": "gabinete pro",
+    "price": "55000$",
+    "thumbnail": "static/img/thumbnail-1646055125626gabo1.jpeg"
+  },
+  {
+    "id": 2,
+    "title": "gabinete re pro ",
+    "price": "60000$",
+    "thumbnail": "static/img/thumbnail-1646055149317gabo.jpeg"
+  },
+  {
+    "id": 3,
+    "title": "hola jose",
+    "price": "000$",
+    "thumbnail": "static/img/thumbnail-1646150990700confu.jpeg"
+  }
+]

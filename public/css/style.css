@@ -1,0 +1,35 @@
+body{
+    background-color: rgb(248, 193, 205);
+}
+
+.nav-item{
+    color:rgb(243, 38, 99);
+    font-size: 18px;
+    font-weight: 500;
+    list-style: none;
+}
+
+#userName{
+    color: rgb(0, 135, 212);
+    font-size: 15px;
+    font-weight: 500;
+}
+
+#btn-cart{
+    color: rgb(10, 83, 107);
+    border: none;
+    background: none;
+}
+
+#btn-cart:hover{
+    color: green;
+}
+
+.card{
+    width: 15rem;
+    margin-top: 5rem;
+    border-radius: 5%;
+    border-width: 0.4rem;
+    border-color: rgb(241, 144, 99);
+}
+
