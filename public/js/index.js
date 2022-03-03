@@ -1,3 +1,5 @@
+const Products = require("../../models/products")
+
 const socket = io()
 const cards = document.querySelector('#cards')
 const div = document.createElement('div')
@@ -27,13 +29,13 @@ const User = {};
 //*********** REGISTER USER **************/
 
 formRegister.addEventListener('submit', (e) => {
-        e.preventDefault()
-        socket.emit('new-User', email.value)
-        myModal.hide(modalIndex)
-    })
+    e.preventDefault()
+    socket.emit('new-User', email.value)
+    myModal.hide(modalIndex)
+})
 
 socket.on('user', user => {
-    if(admin.checked){
+    if (admin.checked) {
         user.admin = true
     }
     if (user.email == email.value) {
@@ -53,6 +55,7 @@ socket.on('user', user => {
 
 socket.on("index", () => {
     myModal.show(modalIndex)
+    renderIndex()
 })
 
 // section NO cards
@@ -72,78 +75,42 @@ async function renderIndex() {
             } else {
                 cards.innerHTML = ""
                 productos.forEach(producto => {
-                    // create elements
-                    const div = document.createElement('div')
-                    const card = document.createElement('div')
-                    const cardBody = document.createElement('div')
-                    const img = document.createElement('img')
-                    const cardTitle = document.createElement('h4')
-                    const cardText = document.createElement('h5')
-                    const divButtons = document.createElement('div')
-                    const addToCart = document.createElement('button')
 
-                    // asign class
-                    div.className = 'col d-flex justify-content-center'
-                    card.className = 'card'
-                    img.className = 'card-img'
-                    img.alt = 'imagen producto'
-                    cardBody.className = 'card-body'
-                    cardTitle.className = 'card-title'
-                    cardText.className = 'card-text'
-                    addToCart.className = 'btn btn-success'
-
-                    // set params
-                    img.src = `${producto.thumbnail}`
-                    cardTitle.innerText = `${producto.title}`
-                    cardText.innerText = `${producto.price}`
-                    addToCart.innerHTML = '<i class="fas fa-cart-plus"></i>'
-
-                    // check if user are admin
-                    console.log(User)
-                    if(User.admin){
-                        renderAdminIndex()
-
-                        // create admin btons 
-                        const btnCreate = document.createElement('button')
-                        const btnDelete = document.createElement('button')
-
-                        // asign class
-                        btnCreate.className = 'btn btn-info'
-                        btnDelete.className = 'btn btn-danger'
-
-                        // set params
-                        btnDelete.innerHTML = '<i class="fas fa-trash"></i>'
-                        btnCreate.innerHTML = '<i class="fas fa-edit"></i>'
-
-
-                        // added to card
-                        divButtons.appendChild(btnCreate)
-                        divButtons.appendChild(btnDelete)
-
-                        // change justify-content 
-                        divButtons.className = 'divButtons container d-flex justify-content-between'
-                    }
-
-                    if(!User.admin){
-                        // change justify-content 
-                        divButtons.className = 'divButtons container d-flex justify-content-center'
-                    }
-
-                    // agrup all
-                    cardBody.appendChild(cardTitle)
-                    cardBody.appendChild(cardText)
-                    divButtons.appendChild(addToCart)
-                    card.appendChild(img)
-                    card.appendChild(cardBody)
-                    card.appendChild(divButtons)
-                    div.appendChild(card)
-
-
-                    // put into index
-                    cards.appendChild(div)
+                    cards.innerHTML += `
+                    <div class="col d-flex justify-content-center">
+                        <div class="card" id="${producto.id}">
+                            <img class="card-img" alt="imagen producto" src="${producto.thumbnail}">
+                            <div class="card-body">
+                                <h4 class="card-title">${producto.title}</h4>
+                                <h5 class="card-text">${producto.price}</h5>
+                            </div>
+                            <div class="divButtons container d-flex ${User.admin ? 'justify-content-between' : 'justify-content-center'}">
+                                ${User.admin ? `
+                                <button class="btn btn-info"  type="submit">
+                                    <i class="fas fa-edit" aria-hidden="true"></i>
+                                </button>
+                                <button class="btn btn-danger"  type="submit">
+                                    <i class="fas fa-trash" aria-hidden="true"></i>
+                                </button>
+                                <button class="btn btn-success"  type="submit">
+                                    <i class="fas fa-cart-plus" aria-hidden="true"></i>
+                                </button>
+                                    ` : `
+                                <button class="btn btn-success"  >
+                                    <i class="fas fa-cart-plus" aria-hidden="true"></i>
+                                </button>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                    `
                 });
-
+                if(User.admin){
+                    renderAdminIndex()
+                }
             }
+            console.log('emit select')
+            socket.emit('select-btns', null)
         })
 }
 
@@ -175,7 +142,7 @@ function renderAdminIndex() {
 }
 
 //********* POST NEW PRODUCTS ***********/
-function postProducts(){
+function postProducts() {
     form.addEventListener('submit', async (e) => {
         e.preventDefault()
         const formData = new FormData(e.currentTarget)
@@ -216,10 +183,23 @@ function cleanInputs() {
 
 myModalCart.hide(modalCart)
 
-Cart.addEventListener('click', () => {
+Cart.addEventListener('click', e => {
+    e.preventDefault()
     myModalCart.show(modalCart)
 })
 
+
+socket.on('selected-btns', () => {
+    console.log('si papa')
+    const cards = document.querySelector('#cards')
+    cards.addEventListener('click', (e) => {
+        console.log(e.target.parentElement.parenElement)
+        addToCart(e)
+    })
+})
+
+function addToCart(e) {
+}
 
 
 

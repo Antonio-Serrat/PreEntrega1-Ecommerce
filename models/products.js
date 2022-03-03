@@ -93,5 +93,24 @@ class Products {
             return error
         }
     }
+
+    async updateById(id, newProduct) {
+        try {
+
+            const data = await fsp.readFile(this.nombreArchivo)
+            const products = JSON.parse(data);
+            const product = products.find(product => product.id == id);
+            const index = products.indexOf(product)
+            newProduct.id = product.id 
+            products.splice(index, 1, newProduct)
+            const updatedProducts = JSON.stringify(products, null, 2);
+            fs.writeFile(this.nombreArchivo, updatedProducts, (err) => {
+                if (err) throw error;
+            });
+            return 'good'
+        } catch (error) {
+            return error
+        }
+    }
 }
 module.exports = Products;

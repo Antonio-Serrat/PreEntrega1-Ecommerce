@@ -35,7 +35,7 @@ app.use("/static", express.static(path.join(__dirname, 'public')))
 app.use("/api/productos", productsRouter);
 app.use("/api/cart", cartRouter);
 
-app.get("/", async (req, res) => {
+app.get("/", (req, res) => {
   res.render(path.join(__dirname, './views/index.handlebars'))
 });
 
@@ -60,7 +60,9 @@ io.on("connection", (socket) => {
     io.sockets.emit('user', user)
   })
  
-
+  socket.on('select-btns', () =>{
+    socket.emit('selected-btns', null)
+  })
 
 
 })
