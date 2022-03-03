@@ -29,8 +29,7 @@ router.post("/", upload.single("thumbnail"), async (req, res) =>{
     }else{
         const { Name, price, description, code, stock} = req.body;
         const thumbnail = path.join("static/img/" + req.file.filename)
-        const date = Date.now()
-        await productModel.save(Name, date, price+"$", description, code, stock, thumbnail).then(id =>{return id});
+        await productModel.save(Name, Date.now(), price+"$", description, code, stock, thumbnail).then(id =>{return id});
         res.status(201).end()
     }
   })
@@ -45,8 +44,7 @@ router.put("/:id", upload.single("thumbnail"), async (req, res) => {
         const newProduct = {}
         const { Name, price, description, code, stock} = req.body;
         const thumbnail = path.join("static/img/" + req.file.filename)
-        const date = Date.now()
-        newProduct.date = date
+        newProduct.date = Date.now()
         newProduct.Name = Name
         newProduct.description = description
         newProduct.code = code
