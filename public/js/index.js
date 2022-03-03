@@ -9,7 +9,7 @@ let title = document.querySelector('#title')
 let price = document.querySelector('#price')
 let file = document.querySelector('#thumbnail')
 const modalIndex = document.querySelector('#modal-index')
-const btnCart = document.querySelector('#btn-cart')
+const Cart = document.querySelector('#btn-cart')
 const modalCart = document.querySelector('#modal-cart')
 const formRegister = document.querySelector('#form-register')
 const email = document.querySelector('#email')
@@ -22,7 +22,7 @@ const myModalCart = new bootstrap.Modal(document.getElementById('modal-cart'), {
     Keyboard: false
 })
 
-let User;
+const User = {};
 
 //*********** REGISTER USER **************/
 
@@ -33,22 +33,26 @@ formRegister.addEventListener('submit', (e) => {
     })
 
 socket.on('user', user => {
-    if(admin){
+    if(admin.checked){
         user.admin = true
     }
     if (user.email == email.value) {
         userName.textContent = user.email
     }
-    if(user.admin == true){
-        renderAdminIndex()
-    }
+
+    // save user into a variable
+    User.email = user.email
+    User.id = user.id
+    User.admin = user.admin
+
+    // render index view
+    renderIndex()
 })
 
-//********** RENDER INDEX ********/
+//********** SHOW MODAL ********/
 
 socket.on("index", () => {
     myModal.show(modalIndex)
-    renderIndex()
 })
 
 // section NO cards
@@ -68,37 +72,75 @@ async function renderIndex() {
             } else {
                 cards.innerHTML = ""
                 productos.forEach(producto => {
-                    //create elements
-                    const div1 = document.createElement('div')
-                    const div2 = document.createElement('div')
-                    const div3 = document.createElement('div')
+                    // create elements
+                    const div = document.createElement('div')
+                    const card = document.createElement('div')
+                    const cardBody = document.createElement('div')
                     const img = document.createElement('img')
-                    const h4_1 = document.createElement('h4')
-                    const h5 = document.createElement('h5')
+                    const cardTitle = document.createElement('h4')
+                    const cardText = document.createElement('h5')
+                    const divButtons = document.createElement('div')
+                    const addToCart = document.createElement('button')
 
-                    //assign class
-                    div1.className = 'col d-flex justify-content-center'
-                    div2.className = 'card'
+                    // asign class
+                    div.className = 'col d-flex justify-content-center'
+                    card.className = 'card'
                     img.className = 'card-img'
                     img.alt = 'imagen producto'
-                    div3.className = 'card-body'
-                    h4_1.className = 'card-title'
-                    h5.className = 'card-text'
-
-                    //agrup all
-                    div3.appendChild(h4_1)
-                    div3.appendChild(h5)
-                    div2.appendChild(img)
-                    div2.appendChild(div3)
-                    div1.appendChild(div2)
+                    cardBody.className = 'card-body'
+                    cardTitle.className = 'card-title'
+                    cardText.className = 'card-text'
+                    addToCart.className = 'btn btn-success'
 
                     // set params
                     img.src = `${producto.thumbnail}`
-                    h4_1.innerText = `${producto.title}`
-                    h5.innerText = `${producto.price}`
+                    cardTitle.innerText = `${producto.title}`
+                    cardText.innerText = `${producto.price}`
+                    addToCart.innerHTML = '<i class="fas fa-cart-plus"></i>'
+
+                    // check if user are admin
+                    console.log(User)
+                    if(User.admin){
+                        renderAdminIndex()
+
+                        // create admin btons 
+                        const btnCreate = document.createElement('button')
+                        const btnDelete = document.createElement('button')
+
+                        // asign class
+                        btnCreate.className = 'btn btn-info'
+                        btnDelete.className = 'btn btn-danger'
+
+                        // set params
+                        btnDelete.innerHTML = '<i class="fas fa-trash"></i>'
+                        btnCreate.innerHTML = '<i class="fas fa-edit"></i>'
+
+
+                        // added to card
+                        divButtons.appendChild(btnCreate)
+                        divButtons.appendChild(btnDelete)
+
+                        // change justify-content 
+                        divButtons.className = 'divButtons container d-flex justify-content-between'
+                    }
+
+                    if(!User.admin){
+                        // change justify-content 
+                        divButtons.className = 'divButtons container d-flex justify-content-center'
+                    }
+
+                    // agrup all
+                    cardBody.appendChild(cardTitle)
+                    cardBody.appendChild(cardText)
+                    divButtons.appendChild(addToCart)
+                    card.appendChild(img)
+                    card.appendChild(cardBody)
+                    card.appendChild(divButtons)
+                    div.appendChild(card)
+
 
                     // put into index
-                    cards.appendChild(div1)
+                    cards.appendChild(div)
                 });
 
             }
@@ -174,7 +216,7 @@ function cleanInputs() {
 
 myModalCart.hide(modalCart)
 
-btnCart.addEventListener('click', () => {
+Cart.addEventListener('click', () => {
     myModalCart.show(modalCart)
 })
 
