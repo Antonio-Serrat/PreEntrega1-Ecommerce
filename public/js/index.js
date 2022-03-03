@@ -5,42 +5,42 @@ const h4 = document.createElement('h4')
 const btn = document.querySelector('#button')
 const sectionForm = document.querySelector('#section-form')
 const form = document.querySelector('#formulary')
-const formRegister = document.querySelector('#form-register')
 let title = document.querySelector('#title')
 let price = document.querySelector('#price')
 let file = document.querySelector('#thumbnail')
 const modalIndex = document.querySelector('#modal-index')
 const btnCart = document.querySelector('#btn-cart')
 const modalCart = document.querySelector('#modal-cart')
-const btnModal = document.querySelector('#modal-btn')
+const formRegister = document.querySelector('#form-register')
 const email = document.querySelector('#email')
-const Name = document.querySelector('#name')
-const password = document.querySelector('#password')
 const userName = document.querySelector('#userName')
+const admin = document.querySelector('#admin')
 const myModal = new bootstrap.Modal(document.getElementById('modal-index'), {
     Keyboard: false
 })
 const myModalCart = new bootstrap.Modal(document.getElementById('modal-cart'), {
     Keyboard: false
 })
-const newUser = {}
 
+let User;
 
-
-//*********** CAPTURE USER **************/
+//*********** REGISTER USER **************/
 
 formRegister.addEventListener('submit', (e) => {
-    e.preventDefault()
-    newUser.email = email.value
-    newUser.name = Name.value
-    newUser.password = password.value
-    newUser.id = socket.id
-    socket.emit('new-User', user)
-    myModal.hide(modalIndex)
-})
+        e.preventDefault()
+        socket.emit('new-User', email.value)
+        myModal.hide(modalIndex)
+    })
+
 socket.on('user', user => {
-    if (user.name == email.value) {
-        userName.textContent = user.name
+    if(admin){
+        user.admin = true
+    }
+    if (user.email == email.value) {
+        userName.textContent = user.email
+    }
+    if(user.admin == true){
+        renderAdminIndex()
     }
 })
 
@@ -49,7 +49,6 @@ socket.on('user', user => {
 socket.on("index", () => {
     myModal.show(modalIndex)
     renderIndex()
-    // if(user)
 })
 
 // section NO cards
@@ -59,7 +58,7 @@ h4.innerText = 'Aun no hay productos agregados'
 div.appendChild(h4)
 
 async function renderIndex() {
-    await fetch(`${formRegister.baseURI}api/productos`)
+    await fetch(`${sectionForm.baseURI}api/productos`)
         .then((res) => {
             return res.clone().json()
         })
@@ -107,30 +106,30 @@ async function renderIndex() {
 }
 
 function renderAdminIndex() {
-    sectionForm.innerHTML(`
-    <div class="title">
-    <h1>Ingrese un producto</h1>
-    </div>
-    <div class="container my-5 justify-content-center">
-        <form id="formulary" >
-            <div class="mb-3">
-                <label class="form-label", id="inputGroup-sizing-default", for="title"> Titulo </label>
-                <input id="title" type="text" name="title", class="form-control", aria-label="Sizing example input", aria-describedby="inputGroup-sizing-default">
-            </div>
-            <div class="mb-3">
-                <label class="form-label", id="inputGroup-sizing-default", for="price"> Precio $ </label>
-                <input id="price" type="number" name="price", class="form-control", aria-label="Amount (to the nearest dollar)">
-            </div>
-            <div class="mb-3"> 
-                <label class="form-label", id="inputGroup-sizing-default", for="thumbnail"> Foto del Producto </label>
-                <input id="thumbnail" type="file" name="thumbnail", class="form-control", aria-label="Sizing example input", aria-describedby="inputGroup-sizing-default">
-            </div>
-            <div class="text-center"> 
-                <button id="button" type="submit" class="btn btn-info text-white"> Agregar producto </button>
-            </div>
-        </form>
-    </div>
-    `)
+    sectionForm.innerHTML = `
+        <div class="title">
+        <h1>Ingrese un producto</h1>
+        </div>
+        <div class="container my-5 justify-content-center">
+            <form id="formulary" >
+                <div class="mb-3">
+                    <label class="form-label", id="inputGroup-sizing-default", for="title"> Titulo </label>
+                    <input id="title" type="text" name="title", class="form-control", aria-label="Sizing example input", aria-describedby="inputGroup-sizing-default">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label", id="inputGroup-sizing-default", for="price"> Precio $ </label>
+                    <input id="price" type="number" name="price", class="form-control", aria-label="Amount (to the nearest dollar)">
+                </div>
+                <div class="mb-3"> 
+                    <label class="form-label", id="inputGroup-sizing-default", for="thumbnail"> Foto del Producto </label>
+                    <input id="thumbnail" type="file" name="thumbnail", class="form-control", aria-label="Sizing example input", aria-describedby="inputGroup-sizing-default">
+                </div>
+                <div class="text-center"> 
+                    <button id="button" type="submit" class="btn btn-info text-white"> Agregar producto </button>
+                </div>
+            </form>
+        </div>
+    `
 }
 
 //********* POST NEW PRODUCTS ***********/
@@ -178,3 +177,22 @@ myModalCart.hide(modalCart)
 btnCart.addEventListener('click', () => {
     myModalCart.show(modalCart)
 })
+
+
+
+
+//***************SECCION PARA FUTURO LOGIN **************/
+//const newUser = {}
+// formRegister.addEventListener('submit', (e) => {
+//     e.preventDefault()
+//     newUser.email = email.value
+//     newUser.name = Name.value
+//     newUser.password = password.value
+//     newUser.id = socket.id
+//     socket.emit('new-User', newUser)
+//     myModal.hide(modalIndex)
+// })
+
+// const email = document.querySelector('#email')
+// const Name = document.querySelector('#name')
+// const password = document.querySelector('#password')

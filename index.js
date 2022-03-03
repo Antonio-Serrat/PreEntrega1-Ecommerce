@@ -5,15 +5,14 @@ const http = require('http')
 const { engine } = require('express-handlebars');
 const productsRouter = require("./routes/products")
 const cartRouter = require('./routes/cart');
-const userModel = require('./models/user')
 
 const app = express();
 const server = http.createServer(app)
 const PORT = process.env.PORT | 8080
 const io = new Server(server)
 
-
-const Users = []
+const users = []
+const user ={}
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -54,8 +53,10 @@ io.on("connection", (socket) => {
     io.sockets.emit('refresh')
   })
 
-  socket.on('new-User', (user) => {
-    Users.push(user)
+  socket.on('new-User', (email) => {
+    user.email = email
+    user.id = socket.id
+    user.admin = false
     io.sockets.emit('user', user)
   })
  
