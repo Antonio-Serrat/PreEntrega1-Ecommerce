@@ -7,12 +7,16 @@ class Products {
         this.nombreArchivo = path.join(__dirname, "../public/database/products.json");
     }
 
-    async save(title, price, thumbnail) {
+    async save(Name, date, price, description, code, stock, thumbnail) {
         let producto = {
             id: 0,
-            title: title,
+            date: date,
+            name: Name,
+            description: description,
+            code: code,
+            thumbnail: thumbnail,
             price: price,
-            thumbnail: thumbnail
+            stock: stock
         };
         let newProducts = [];
         try {

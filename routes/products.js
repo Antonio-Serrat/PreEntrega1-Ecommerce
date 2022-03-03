@@ -27,9 +27,10 @@ router.post("/", upload.single("thumbnail"), async (req, res) =>{
         res.status(403)
         .send({error: 'Usted no posee el permiso de administrador para realizar esta llamda'})
     }else{
-        const { title, price} = req.body;
+        const { Name, price, description, code, stock} = req.body;
         const thumbnail = path.join("static/img/" + req.file.filename)
-        await productModel.save(title, price+"$", thumbnail).then(id =>{return id});
+        const date = Date.now()
+        await productModel.save(Name, date, price+"$", description, code, stock, thumbnail).then(id =>{return id});
         res.status(201).end()
     }
   })
@@ -42,11 +43,16 @@ router.put("/:id", upload.single("thumbnail"), async (req, res) => {
         .send({error: 'Usted no posee el permiso de administrador para realizar esta llamda'})
     }else{
         const newProduct = {}
-        const { title, price} = req.body;
+        const { Name, price, description, code, stock} = req.body;
         const thumbnail = path.join("static/img/" + req.file.filename)
-        newProduct.title = title
-        newProduct.price = price
+        const date = Date.now()
+        newProduct.date = date
+        newProduct.Name = Name
+        newProduct.description = description
+        newProduct.code = code
         newProduct.thumbnail = thumbnail
+        newProduct.price = price
+        newProduct.stock = stock
         await productModel.updateById(req.params.id, newProduct)
         res.status(200).send('actualizado')
     }
