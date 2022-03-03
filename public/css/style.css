@@ -33,3 +33,14 @@ body{
     border-color: rgb(241, 144, 99);
 }
 
+#products{
+    background-color: rgba(85, 143, 124, 0.151);
+}
+
+.title{
+    text-align: center;
+}
+
+.search-product{
+    text-align: center;
+}

@@ -2,20 +2,18 @@ const express = require('express')
 const { Server } = require('socket.io')
 const path = require('path');
 const http = require('http')
-const Product = require('./models/products')
-const upload = require('./middlewares/file');
 const { engine } = require('express-handlebars');
-const fetch = require('node-fetch')
-const cors = require('cors');
+const productsRouter = require("./routes/products")
+const cartRouter = require('./routes/cart');
+const userModel = require('./models/user')
 
 const app = express();
 const server = http.createServer(app)
 const PORT = process.env.PORT | 8080
 const io = new Server(server)
-const productModel = new Product();
 
-user={}
-users = []
+
+const Users = []
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -35,18 +33,17 @@ app.engine('handlebars', engine({
 app.set('view engine', 'handlebars')
 app.use("/static", express.static(path.join(__dirname, 'public')))
 
+app.use("/api/productos", productsRouter);
+app.use("/api/cart", cartRouter);
 
 app.get("/", async (req, res) => {
   res.render(path.join(__dirname, './views/index.handlebars'))
 });
 
+app.post('/', async (req, res)=>{
+  
+})
 
-app.post("/", upload.single("thumbnail"), async (req, res) =>{
-    const { title, price} = req.body;
-    const thumbnail = path.join("static/img/" + req.file.filename)
-    await productModel.save(title, price+"$", thumbnail).then(id =>{return id});
-    res.end()
-  })
 
 io.on("connection", (socket) => {
   console.log(`Nuevo usuario conectado: ${socket.id}`)
@@ -57,12 +54,8 @@ io.on("connection", (socket) => {
     io.sockets.emit('refresh')
   })
 
-  socket.on('new-User', (userName) => {
-    user = {
-      name: userName,
-      id: socket.id
-    }
-    users.push(user)
+  socket.on('new-User', (user) => {
+    Users.push(user)
     io.sockets.emit('user', user)
   })
  
