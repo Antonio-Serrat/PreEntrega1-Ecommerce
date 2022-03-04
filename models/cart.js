@@ -40,7 +40,7 @@ class Cart {
         }
     }
 
-    async deleteById(id) {
+    async deleteCartById(id) {
         try {
             const data = await fsp.readFile(this.nombreArchivo)
             const carts = JSON.parse(data);
@@ -63,9 +63,6 @@ class Cart {
             const data = await fsp.readFile(this.nombreArchivo)
             const carts = JSON.parse(data);
             const cartById = carts.find(cart => cart.id == id)
-            if (cartById = null) {
-                return error;
-            }
             return cartById.products
         } catch (error) {
             return error
@@ -77,11 +74,27 @@ class Cart {
             const data = await fsp.readFile(this.nombreArchivo)
             const carts = JSON.parse(data);
             const cartById = carts.find(cart => cart.id == id)
-            if (cartById = null) {
-                return error;
+            const index = carts.indexOf(cartById)
+            const cartProducts = cartById.products
+            const validateProd = cartProducts.find(prodct => prodct.id === product.id)
+            const indexProd = cartProducts.indexOf(validateProd)
+            if(validateProd){
+                let cant = 1
+                validateProd.cant = cant+1
+                cartProducts.splice(indexProd, 1, validateProd)
+                carts.splice(index, 1, cartById)
+
+
+            }else{
+                cartById.products.push(product)
+                carts.splice(index, 1, cartById)
             }
-            cartById.products.push(product)
-            return 'added'
+            
+            const newCart = JSON.stringify(carts, null, 2);
+            fs.writeFile(this.nombreArchivo, newCart, (err) => {
+                if (err) throw error;
+            }); 
+            return 
         } catch (error) {
             return error
         }
@@ -98,10 +111,16 @@ class Cart {
 
             const allProducts = cart.products
             const product = allProducts.find(product => product.id == idP)
-            const index = allProducts.indexOf(product)
-            allProducts.splice(index, 1)
-            const productsUpdated = JSON.stringify(allProducts, null, 2);
-            fs.writeFile(this.nombreArchivo, productsUpdated, (err) => {
+            if(product.cant > 1){
+                product.cant = product.cant-1
+                const index = allProducts.indexOf(product)
+                allProducts.splice(index, 1, product)
+            }else{
+                const index = allProducts.indexOf(product)
+                allProducts.splice(index, 1)
+            }
+            const cartUpdated = JSON.stringify(carts, null, 2);
+            fs.writeFile(this.nombreArchivo, cartUpdated, (err) => {
                 if (err) throw error;
             });
         } catch (error) {

@@ -33,7 +33,7 @@ app.set('view engine', 'handlebars')
 app.use("/static", express.static(path.join(__dirname, 'public')))
 
 app.use("/api/productos", productsRouter);
-app.use("/api/cart", cartRouter);
+app.use("/api/carrito", cartRouter);
 
 app.get("/", (req, res) => {
   res.render(path.join(__dirname, './views/index.handlebars'))

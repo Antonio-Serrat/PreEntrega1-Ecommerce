@@ -7,7 +7,7 @@ const productModel = new Product();
 const upload = require('../middlewares/file');
 const router = Router();
 
-admin = false
+admin = true
 
 // get all produts
 router.get('/', async (req, res) => {
@@ -28,9 +28,10 @@ router.post("/", upload.single("thumbnail"), async (req, res) =>{
         .send({error: 'Usted no posee el permiso de administrador para realizar esta llamda'})
     }else{
         const { Name, price, description, code, stock} = req.body;
+        const date = Date.now()
         const thumbnail = path.join("static/img/" + req.file.filename)
-        await productModel.save(Name, Date.now(), price+"$", description, code, stock, thumbnail).then(id =>{return id});
-        res.status(201).end()
+        await productModel.save(Name, date, price+"$", description, code, stock, thumbnail).then(id =>{return id});
+        res.status(201).send({success: 'Producto creado con exito'})
     }
   })
 
@@ -52,7 +53,7 @@ router.put("/:id", upload.single("thumbnail"), async (req, res) => {
         newProduct.price = price
         newProduct.stock = stock
         await productModel.updateById(req.params.id, newProduct)
-        res.status(200).send('actualizado')
+        res.status(200).send({success: 'Producto actualizado'})
     }
 })
 
@@ -63,7 +64,7 @@ router.delete('/:id', (req, res)=> {
         .send({error: 'Usted no posee el permiso de administrador para realizar esta llamda'})
     }else{
         productModel.deleteById(req.params.id)
-        res.status(200).send('eliminado con exito')
+        res.status(200).send({success: 'Producto eliminado con exito'})
     }
 })
 
