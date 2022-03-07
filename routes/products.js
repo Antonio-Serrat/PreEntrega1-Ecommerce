@@ -18,7 +18,8 @@ router.get('/', async (req, res) => {
 // get product by id
 router.get('/:id', async (req, res)=> {
     const product = await productModel.getById(req.params.id)
-    res.status(200).send(product)
+    !product ? res.status(404).send({error:'El producto no existe o el id es erroeo'})
+    : res.status(200).send(product)
 })
 
 // add new product
@@ -58,13 +59,14 @@ router.put("/:id", upload.single("thumbnail"), async (req, res) => {
 })
 
 // delete product by id
-router.delete('/:id', (req, res)=> {
+router.delete('/:id', async (req, res)=> {
     if(!admin){
         res.status(403)
         .send({error: 'Usted no posee el permiso de administrador para realizar esta llamda'})
     }else{
-        productModel.deleteById(req.params.id)
-        res.status(200).send({success: 'Producto eliminado con exito'})
+        const deleted = await productModel.deleteById(req.params.id)
+        !deleted ? res.status(404).send({error:'No se encontro el producto'})
+        : res.status(200).send({success: 'Producto eliminado con exito'})
     }
 })
 

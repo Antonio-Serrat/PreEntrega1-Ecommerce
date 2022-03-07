@@ -21,8 +21,9 @@ router.post('/', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
     try{
-        await cartModule.deleteCartById(req.params.id)
-        res.status(201).send({succes:'Carrito eliminado'})
+        const deleted = await cartModule.deleteCartById(req.params.id)
+        !deleted ? res.status(404).send({error: 'El carrito no existe'})
+        : res.status(201).send({succes:'Carrito eliminado'})
     }catch(e){
         res.status(400).send({
             error: 'No se pudo eliminar el carrito ',
@@ -47,7 +48,22 @@ router.post('/:id/productos/:id_prod', async (req, res) => {
     try {
         const product = await productModel.getById(req.params.id_prod)
         console.log(product)
-        await cartModule.addProductToCart(req.params.id, product)
+        !product ? res.status(404).send({error: 'El id de producto no existe'})
+        : await cartModule.addProductToCart(req.params.id, product)
+        res.status(200).send({success: 'Se agrego con exito el nuevo producto al carrito'})
+    } catch (error) {
+        res.status(400).send({
+            error: 'No se pudo agregar el producto al carrito ',
+            desrciption: error
+    })
+    }
+})
+
+router.post('/:id/productos', async (req, res) => {
+    try {
+        const product = await productModel.getById(req.params.id)
+        !product ? res.status(404).send({error:'El id de producto no existe'})
+        : await cartModule.addProductToNewCart(product)
         res.status(200).send({success: 'Se agrego con exito el nuevo producto al carrito'})
     } catch (error) {
         res.status(400).send({
@@ -59,8 +75,9 @@ router.post('/:id/productos/:id_prod', async (req, res) => {
 
 router.delete('/:id/productos/:id_prod', async(req, res) => {
     try {
-        await cartModule.deleteProductFromCart(req.params.id, req.params.id_prod)
-        res.status(200).send({success:'Se elimino el producto del carrito con exito'})
+        const deleted = await cartModule.deleteProductFromCart(req.params.id, req.params.id_prod)
+        !deleted ? res.status(404).send({error:'El id del carrito o del producto no existe'})
+        : res.status(200).send({success:'Se elimino el producto del carrito con exito'})
     } catch (error) {
         res.status(400).send({
             error: 'No se pudo eliminar el producto del carrito ',

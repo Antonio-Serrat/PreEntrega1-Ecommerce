@@ -1,10 +1,10 @@
 const fsp = require('fs').promises;
 const fs = require('fs');
 const path = require('path');
-
+const db = path.join(__dirname, "../public/database/cart.json")
 class Cart {
     constructor() {
-        this.nombreArchivo = path.join(__dirname, "../public/database/cart.json");
+        this.nombreArchivo = db;
     }
 
     async save() {
@@ -17,24 +17,22 @@ class Cart {
         try {
             if (!(fs.existsSync(this.nombreArchivo))) {
                 const data = JSON.stringify(newCart, null, 2)
-                fs.writeFileSync(`./${this.nombreArchivo}`, data, (err) => {
-                    if (err) throw error;
-                })
+                await writeFile(data)
             }
-            const data = await fsp.readFile(this.nombreArchivo) 
-                const carts = JSON.parse(data);
-                newCart = carts;
-                newCart.push(cart);
+            const carts = await readFile()
 
-                let i = newCart.length - 2;
-                i < 0 ? i = 0 : i;
-                let id = newCart[i].id + 1;
-                cart.id = id;
-                cart.id == 0 ? cart.id = 1 : cart.id;
-                const allCarts = JSON.stringify(newCart, null, 2);
+            newCart = carts;
+            newCart.push(cart);
 
-               await fsp.writeFile(this.nombreArchivo, allCarts, 'utf-8')
-                    return cart.id;
+            let i = newCart.length - 2;
+            i < 0 ? i = 0 : i;
+            let id = newCart[i].id + 1;
+            cart.id = id;
+            cart.id == 0 ? cart.id = 1 : cart.id;
+            const allCarts = JSON.stringify(newCart, null, 2);
+
+            await writeFile(allCarts)
+            return cart.id;
         } catch (error) {
             return error;
         }
@@ -42,17 +40,16 @@ class Cart {
 
     async deleteCartById(id) {
         try {
-            const data = await fsp.readFile(this.nombreArchivo)
-            const carts = JSON.parse(data);
+            const carts = await readFile()
             const cart = carts.find(cart => cart.id == id);
             if (cart) {
                 const index = carts.indexOf(cart)
                 carts.splice(index, 1)
+                return true
+            }else{
+                return false
             }
-            const newCart = JSON.stringify(carts, null, 2);
-            fs.writeFile(this.nombreArchivo, newCart, (err) => {
-                if (err) throw error;
-            });
+
         } catch (error) {
             return error
         }
@@ -60,8 +57,7 @@ class Cart {
     
     async getProductsFromCart(id){
         try {
-            const data = await fsp.readFile(this.nombreArchivo)
-            const carts = JSON.parse(data);
+            const carts = await readFile()
             const cartById = carts.find(cart => cart.id == id)
             return cartById.products
         } catch (error) {
@@ -71,30 +67,41 @@ class Cart {
 
     async addProductToCart(id, product){
         try {
-            const data = await fsp.readFile(this.nombreArchivo)
-            const carts = JSON.parse(data);
+            const carts = await readFile()
             const cartById = carts.find(cart => cart.id == id)
+            
             const index = carts.indexOf(cartById)
             const cartProducts = cartById.products
             const validateProd = cartProducts.find(prodct => prodct.id === product.id)
             const indexProd = cartProducts.indexOf(validateProd)
+            
             if(validateProd){
                 let cant = 1
                 validateProd.cant = cant+1
                 cartProducts.splice(indexProd, 1, validateProd)
                 carts.splice(index, 1, cartById)
-
-
             }else{
                 cartById.products.push(product)
                 carts.splice(index, 1, cartById)
             }
-            
             const newCart = JSON.stringify(carts, null, 2);
-            fs.writeFile(this.nombreArchivo, newCart, (err) => {
-                if (err) throw error;
-            }); 
-            return 
+            await writeFile(newCart) 
+        } catch (error) {
+            return error
+        }
+    }
+
+    async addProductToNewCart(product){
+        try {
+            const cartId = await this.save()
+            const carts = await readFile()
+            console.log(carts)
+            const cart = carts.find(cart => cart.id == cartId)
+            console.log(cart)
+            console.log(product)
+            cart.products.push(product)
+            const newCart = JSON.stringify(carts, null, 2);
+            await writeFile(newCart)
         } catch (error) {
             return error
         }
@@ -102,15 +109,17 @@ class Cart {
 
     async deleteProductFromCart(idC, idP) {
         try {
-            const data = await fsp.readFile(this.nombreArchivo)
-            const carts = JSON.parse(data);
+            const carts = await readFile()
             const cart = carts.find(cart => cart.id == idC);
             if (!cart) {
-                return error;
+                return false;
             }
 
             const allProducts = cart.products
             const product = allProducts.find(product => product.id == idP)
+            if(!product){
+                return false
+            }
             if(product.cant > 1){
                 product.cant = product.cant-1
                 const index = allProducts.indexOf(product)
@@ -120,13 +129,23 @@ class Cart {
                 allProducts.splice(index, 1)
             }
             const cartUpdated = JSON.stringify(carts, null, 2);
-            fs.writeFile(this.nombreArchivo, cartUpdated, (err) => {
-                if (err) throw error;
-            });
+            await writeFile(cartUpdated)
+            return true
         } catch (error) {
             return error
         }
     }
 }
+
+async function readFile(){
+    const data = await fsp.readFile(db)
+    return JSON.parse(data);
+}
+
+async function writeFile(data){
+    await fsp.writeFile(db, data, 'utf-8')
+    return
+}
+
 
 module.exports = Cart

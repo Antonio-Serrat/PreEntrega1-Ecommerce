@@ -1,10 +1,10 @@
 const fsp = require('fs').promises;
 const fs = require('fs');
 const path = require('path');
-
+const db = path.join(__dirname, "../public/database/products.json")
 class Products {
     constructor() {
-        this.nombreArchivo = path.join(__dirname, "../public/database/products.json");
+        this.nombreArchivo = db;
     }
 
     async save(Name, date, price, description, code, stock, thumbnail) {
@@ -22,9 +22,8 @@ class Products {
         try {
             if (!(fs.existsSync(this.nombreArchivo))) {
                 const data = JSON.stringify(newProducts, null, 2)
-                fs.writeFileSync(`./${this.nombreArchivo}`, data, (err) => {
-                    if (err) throw error;
-                })
+                writeFile(data)
+
             }
             const data = await fsp.readFile(this.nombreArchivo) 
                 const products = JSON.parse(data);
@@ -38,8 +37,8 @@ class Products {
                 producto.id == 0 ? producto.id = 1 : producto.id;
                 const allProducts = JSON.stringify(newProducts, null, 2);
 
-               await fsp.writeFile(this.nombreArchivo, allProducts, 'utf-8')
-                    return producto.id;
+                writeFile(allProducts)
+                return producto.id;
         } catch (error) {
             return error;
         }
@@ -47,8 +46,7 @@ class Products {
 
     async getAll() {
         try {
-            const data = await fsp.readFile(this.nombreArchivo)
-            const products = JSON.parse(data);
+            const products = await readFile()
             return products;
         } catch (error) {
             return error
@@ -57,13 +55,9 @@ class Products {
 
     async getById(id) {
         try {
-            const data = await fsp.readFile(this.nombreArchivo)
-            const products = JSON.parse(data);
+            const products = await readFile()
             const product = products.find(product => product.id == id)
-            if (product != null) {
-                return product;
-            }
-            return null;
+            return product
         } catch (error) {
             return error
         }
@@ -71,17 +65,16 @@ class Products {
 
     async deleteById(id) {
         try {
-            const data = await fsp.readFile(this.nombreArchivo)
-            const products = JSON.parse(data);
+            const products = await readFile()
             const product = products.find(product => product.id == id);
             if (product) {
                 const index = products.indexOf(product)
                 products.splice(index, 1)
+                return true
             }
-            const newProducts = JSON.stringify(products, null, 2);
-            fs.writeFile(this.nombreArchivo, newProducts, (err) => {
-                if (err) throw error;
-            });
+            else{
+                return false
+            }
         } catch (error) {
             return error
         }
@@ -89,10 +82,8 @@ class Products {
 
     async deleteAll() {
         try {
-            await fsp.writeFile(this.nombreArchivo, "[]", (err) => {
-                if (err) throw error;
-            })
-
+            writeFile('[]')
+            return
         } catch (error) {
             return error
         }
@@ -100,21 +91,29 @@ class Products {
 
     async updateById(id, newProduct) {
         try {
-
-            const data = await fsp.readFile(this.nombreArchivo)
-            const products = JSON.parse(data);
+            const products = await readFile()
             const product = products.find(product => product.id == id);
             const index = products.indexOf(product)
             newProduct.id = product.id 
             products.splice(index, 1, newProduct)
             const updatedProducts = JSON.stringify(products, null, 2);
-            fs.writeFile(this.nombreArchivo, updatedProducts, (err) => {
-                if (err) throw error;
-            });
-            return 'good'
+            writeFile(updatedProducts)
+            return
         } catch (error) {
             return error
         }
     }
 }
+
+
+async function readFile (){
+    const data = await fsp.readFile(db)
+    return JSON.parse(data);
+}
+
+async function writeFile(data){
+    await fsp.writeFile(db, data, 'utf-8')
+    return
+}
+
 module.exports = Products;

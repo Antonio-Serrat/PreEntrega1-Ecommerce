@@ -1,12 +1,18 @@
 [
   {
     "id": 1,
-    "createDate": 1646435556534,
-    "products": []
-  },
-  {
-    "id": 2,
-    "createDate": 1646435557748,
-    "products": []
+    "createDate": 1646697251380,
+    "products": [
+      {
+        "id": 2,
+        "date": 1646433832349,
+        "description": "buenasbuenas",
+        "code": "0088",
+        "thumbnail": "static/img/thumbnail-1646433832346mensaje-codigo-portabilidadPersoal.jpeg",
+        "price": "15.18$",
+        "stock": "5",
+        "cant": 2
+      }
+    ]
   }
 ]

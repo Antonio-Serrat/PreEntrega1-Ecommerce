@@ -1,5 +1,3 @@
-const Products = require("../../models/products")
-
 const socket = io()
 const cards = document.querySelector('#cards')
 const div = document.createElement('div')
@@ -48,14 +46,14 @@ socket.on('user', user => {
     User.admin = user.admin
 
     // render index view
-    renderIndex()
+    await renderIndex()
 })
 
 //********** SHOW MODAL ********/
 
 socket.on("index", () => {
     myModal.show(modalIndex)
-    renderIndex()
+    await renderIndex()
 })
 
 // section NO cards
@@ -106,7 +104,7 @@ async function renderIndex() {
                     `
                 });
                 if(User.admin){
-                    renderAdminIndex()
+                    await renderAdminIndex()
                 }
             }
             console.log('emit select')
@@ -114,7 +112,7 @@ async function renderIndex() {
         })
 }
 
-function renderAdminIndex() {
+async function renderAdminIndex() {
     sectionForm.innerHTML = `
         <div class="title">
         <h1>Ingrese un producto</h1>
@@ -157,8 +155,8 @@ function postProducts() {
     })
 }
 socket.on('refresh', () => {
-    cleanInputs()
-    renderIndex()
+    await cleanInputs()
+    await renderIndex()
 })
 
 function renderTitle(formData) {
@@ -174,7 +172,7 @@ function renderFile(formData) {
 
     file.textContent = fileFd
 }
-function cleanInputs() {
+async function cleanInputs() {
     form.reset()
 }
 
