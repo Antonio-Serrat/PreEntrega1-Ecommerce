@@ -43,8 +43,6 @@ app.get("/", (req, res) => {
 });
 
 
-
-
 io.on("connection", (socket) => {
   console.log(`Nuevo usuario conectado: ${socket.id}`)
 

@@ -13,7 +13,7 @@ admin = true
 router.get('/', async (req, res) => {
     try {
         const products =  await productModel.getAll()
-        !products ? res.status(404).send({error:'Hubo un inconveniente al tratar de recuperar todos los prodcutos, trate nuevamente en unos minutos.'})
+        !products ? res.status(417).send({error:'Hubo un inconveniente al tratar de recuperar todos los prodcutos, trate nuevamente en unos minutos.'})
         : res.status(200).send(products)    
     } catch (error) {
         res.status(400).send({
@@ -27,7 +27,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res)=> {
     try {
         const product = await productModel.getById(req.params.id)
-        !product ? res.status(404).send({error:'El producto no existe o el id es erroeo'})
+        !product ? res.status(417).send({error:'El producto no existe o el id es erroeo'})
         : res.status(200).send(product)
     } catch (error) {
         res.status(400).send({
