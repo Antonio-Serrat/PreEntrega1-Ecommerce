@@ -7,18 +7,20 @@ const cartModule = new Cart()
 const Product = require('../models/products')
 const productModel = new Product();
 
+// Create new Cart
 router.post('/', async (req, res) => {
     try{
         await cartModule.save()
         res.status(201).send({succes:'Carrito creado'})
     }catch(e){
         res.status(400).send({
-            error: 'No se pudo crear el nuevo carrito ',
+            error: 'Problema al intentar crear un nuevo carrito ',
             desrciption: e
     })
     }
 })
 
+// Delete Cart by ID
 router.delete('/:id', async (req, res) => {
     try{
         const deleted = await cartModule.deleteCartById(req.params.id)
@@ -26,19 +28,21 @@ router.delete('/:id', async (req, res) => {
         : res.status(201).send({succes:'Carrito eliminado'})
     }catch(e){
         res.status(400).send({
-            error: 'No se pudo eliminar el carrito ',
+            error: 'Problema al intentar eliminar el carrito ',
             desrciption: e
     })
     }
 })
 
+// Get Products from Cart
 router.get('/:id/productos', async (req, res) =>{
     try {
         const products = await cartModule.getProductsFromCart(req.params.id)
-        res.status(200).send(products)
+        !products ? res.status(404).send({error: 'El carrito no existe o el id es erroneo'})
+        : res.status(200).send(products)
     } catch (error) {
         res.status(400).send({
-            error: 'No se pudieron listar los productos el carrito ',
+            error: 'Problema al intentar listar los productos el carrito ',
             desrciption: error
     })
     }
@@ -53,7 +57,7 @@ router.post('/:id/productos/:id_prod', async (req, res) => {
         res.status(200).send({success: 'Se agrego con exito el nuevo producto al carrito'})
     } catch (error) {
         res.status(400).send({
-            error: 'No se pudo agregar el producto al carrito ',
+            error: 'Problema al intentar agregar el producto al carrito ',
             desrciption: error
     })
     }
@@ -67,7 +71,7 @@ router.post('/:id/productos', async (req, res) => {
         res.status(200).send({success: 'Se agrego con exito el nuevo producto al carrito'})
     } catch (error) {
         res.status(400).send({
-            error: 'No se pudo agregar el producto al carrito ',
+            error: 'Problema al intentar agregar el producto al carrito ',
             desrciption: error
     })
     }
@@ -80,7 +84,7 @@ router.delete('/:id/productos/:id_prod', async(req, res) => {
         : res.status(200).send({success:'Se elimino el producto del carrito con exito'})
     } catch (error) {
         res.status(400).send({
-            error: 'No se pudo eliminar el producto del carrito ',
+            error: 'Problema al intentar eliminar el producto del carrito ',
             desrciption: error
     })
     }
