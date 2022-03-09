@@ -12,7 +12,8 @@ admin = true
 // get all produts
 router.get('/', async (req, res) => {
     const products =  await productModel.getAll()
-    res.status(200).send(products)    
+    !products ? res.status(404).send({error:'HUbo un inconveniente al tratar de recuperar todos los prodcutos, trate nuevamente en unos minutos.'})
+    : res.status(200).send(products)    
 })
 
 // get product by id
