@@ -23,9 +23,7 @@ app.use((req, res, next) => {
 });
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
-app.use(function(req,res){
-  res.status(404).send({error:-2, descripcion:'la ruta solicitada o el metodo no se encuentra implementado'})
-})
+
 
 app.engine('handlebars', engine({
   layoutsDir: path.join(__dirname, './views'),
@@ -42,7 +40,10 @@ app.get("/", (req, res) => {
   res.render(path.join(__dirname, './views/index.handlebars'))
 });
 
-
+app.use(function(req,res){
+  res.status(404).send({error:-2, descripcion:'la ruta solicitada o el metodo no se encuentra implementado'})
+})
+  
 io.on("connection", (socket) => {
   console.log(`Nuevo usuario conectado: ${socket.id}`)
 

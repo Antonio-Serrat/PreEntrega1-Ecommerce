@@ -59,7 +59,11 @@ class Cart {
         try {
             const carts = await readFile()
             const cartById = carts.find(cart => cart.id == id)
-            return cartById.products
+            if(!cartById){
+                return false
+            }else{
+                return cartById.products
+            }
         } catch (error) {
             return error
         }
@@ -79,11 +83,10 @@ class Cart {
                 let cant = 1
                 validateProd.cant = cant+1
                 cartProducts.splice(indexProd, 1, validateProd)
-                carts.splice(index, 1, cartById)
             }else{
                 cartById.products.push(product)
-                carts.splice(index, 1, cartById)
             }
+            carts.splice(index, 1, cartById)
             const newCart = JSON.stringify(carts, null, 2);
             await writeFile(newCart) 
         } catch (error) {

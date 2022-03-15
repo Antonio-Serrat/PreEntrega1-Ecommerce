@@ -28,13 +28,13 @@ class Products {
             const data = await fsp.readFile(this.nombreArchivo) 
                 const products = JSON.parse(data);
                 newProducts = products;
-                newProducts.push(producto);
-
-                let i = newProducts.length - 2;
-                i < 0 ? i = 0 : i;
-                let id = newProducts[i].id + 1;
-                producto.id = id;
-                producto.id == 0 ? producto.id = 1 : producto.id;
+                if (newProducts.length === 0)
+                {
+                producto.id = 0
+                } else {
+                producto.id = newProducts[newProducts.length - 1].id + 1
+                }
+                newProducts.push(producto)
                 const allProducts = JSON.stringify(newProducts, null, 2);
 
                 writeFile(allProducts)
