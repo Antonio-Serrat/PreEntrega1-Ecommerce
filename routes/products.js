@@ -47,8 +47,9 @@ router.post("/", upload.single("thumbnail"), async (req, res) =>{
             const { Name, price, description, code, stock} = req.body;
             const date = Date.now()
             const thumbnail = path.join("static/img/" + req.file.filename)
-            await productModel.save(Name, date, price+"$", description, code, stock, thumbnail).then(id =>{return id});
-            res.status(201).send({success: 'Producto creado con exito'})
+            const id = await productModel.save(Name, date, price+"$", description, code, stock, thumbnail);
+            !id ? res.status(404).send({error:'El producto no existe o el id es erroeo'})
+            : res.status(201).send({success: 'Producto creado con exito', id_prod: id})
         }
     } catch (error) {
         res.status(500).send({

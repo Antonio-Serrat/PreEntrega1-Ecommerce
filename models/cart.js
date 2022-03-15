@@ -11,7 +11,7 @@ class Cart {
         let cart = {
             id: 0,
             createDate: Date.now(),
-            products : []
+            products: []
         };
         let newCart = [];
         try {
@@ -20,17 +20,14 @@ class Cart {
                 await writeFile(data)
             }
             const carts = await readFile()
-
             newCart = carts;
+            if (newCart.length === 0) {
+                cart.id = 0
+            } else {
+                cart.id = newCart[newCart.length - 1].id + 1
+            }
             newCart.push(cart);
-
-            let i = newCart.length - 2;
-            i < 0 ? i = 0 : i;
-            let id = newCart[i].id + 1;
-            cart.id = id;
-            cart.id == 0 ? cart.id = 1 : cart.id;
             const allCarts = JSON.stringify(newCart, null, 2);
-
             await writeFile(allCarts)
             return cart.id;
         } catch (error) {
@@ -46,7 +43,7 @@ class Cart {
                 const index = carts.indexOf(cart)
                 carts.splice(index, 1)
                 return true
-            }else{
+            } else {
                 return false
             }
 
@@ -54,14 +51,14 @@ class Cart {
             return error
         }
     }
-    
-    async getProductsFromCart(id){
+
+    async getProductsFromCart(id) {
         try {
             const carts = await readFile()
             const cartById = carts.find(cart => cart.id == id)
-            if(!cartById){
+            if (!cartById) {
                 return false
-            }else{
+            } else {
                 return cartById.products
             }
         } catch (error) {
@@ -69,32 +66,32 @@ class Cart {
         }
     }
 
-    async addProductToCart(id, product){
+    async addProductToCart(id, product) {
         try {
             const carts = await readFile()
             const cartById = carts.find(cart => cart.id == id)
-            
+
             const index = carts.indexOf(cartById)
             const cartProducts = cartById.products
             const validateProd = cartProducts.find(prodct => prodct.id === product.id)
             const indexProd = cartProducts.indexOf(validateProd)
-            
-            if(validateProd){
+
+            if (validateProd) {
                 let cant = 1
-                validateProd.cant = cant+1
+                validateProd.cant = cant + 1
                 cartProducts.splice(indexProd, 1, validateProd)
-            }else{
+            } else {
                 cartById.products.push(product)
             }
             carts.splice(index, 1, cartById)
             const newCart = JSON.stringify(carts, null, 2);
-            await writeFile(newCart) 
+            await writeFile(newCart)
         } catch (error) {
             return error
         }
     }
 
-    async addProductToNewCart(product){
+    async addProductToNewCart(product) {
         try {
             const cartId = await this.save()
             const carts = await readFile()
@@ -120,14 +117,14 @@ class Cart {
 
             const allProducts = cart.products
             const product = allProducts.find(product => product.id == idP)
-            if(!product){
+            if (!product) {
                 return false
             }
-            if(product.cant > 1){
-                product.cant = product.cant-1
+            if (product.cant > 1) {
+                product.cant = product.cant - 1
                 const index = allProducts.indexOf(product)
                 allProducts.splice(index, 1, product)
-            }else{
+            } else {
                 const index = allProducts.indexOf(product)
                 allProducts.splice(index, 1)
             }
@@ -140,12 +137,12 @@ class Cart {
     }
 }
 
-async function readFile(){
+async function readFile() {
     const data = await fsp.readFile(db)
     return JSON.parse(data);
 }
 
-async function writeFile(data){
+async function writeFile(data) {
     await fsp.writeFile(db, data, 'utf-8')
     return
 }
